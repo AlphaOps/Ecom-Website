@@ -87,20 +87,30 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // 5. HERO THUMBNAIL LOGIC
-    const heroMainImg = document.querySelector('.visual-card img');
+    const heroMainImg = document.getElementById('heroImage');
+    const heroMainVideo = document.getElementById('heroVideo');
     const thumbStripImgs = document.querySelectorAll('.thumb-strip img');
     
-    if (heroMainImg && thumbStripImgs.length > 0) {
+    if (thumbStripImgs.length > 0) {
         thumbStripImgs.forEach(thumb => {
             thumb.addEventListener('click', () => {
                 thumbStripImgs.forEach(t => t.classList.remove('active'));
                 thumb.classList.add('active');
                 
-                heroMainImg.style.opacity = '0';
-                setTimeout(() => {
-                    heroMainImg.src = thumb.src;
-                    heroMainImg.style.opacity = '1';
-                }, 150);
+                if (thumb.dataset.type === 'video') {
+                    if (heroMainImg) heroMainImg.style.display = 'none';
+                    if (heroMainVideo) heroMainVideo.style.display = 'block';
+                } else {
+                    if (heroMainVideo) heroMainVideo.style.display = 'none';
+                    if (heroMainImg) {
+                        heroMainImg.style.display = 'block';
+                        heroMainImg.style.opacity = '0';
+                        setTimeout(() => {
+                            heroMainImg.src = thumb.src;
+                            heroMainImg.style.opacity = '1';
+                        }, 50);
+                    }
+                }
             });
         });
     }

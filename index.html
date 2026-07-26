@@ -52,13 +52,14 @@
             
             <!-- Hero Visual (Left) -->
             <div class="hero-visual fade-in">
-                <div class="hero-card visual-card">
-                    <span class="eyebrow-badge badge-absolute">नवीन</span>
-                    <img src="assets/images/product-main.png" alt="Shuga Amrit Bottle">
+                <div class="hero-card visual-card" style="padding: 0; overflow: hidden; background: #000;">
+                    <span class="eyebrow-badge badge-absolute" style="z-index: 10;">नवीन</span>
+                    <video id="heroVideo" autoplay loop muted playsinline src="https://res.cloudinary.com/dp7xtame0/video/upload/v1785054640/WhatsApp_Video_2026-07-26_at_13.58.45_nrepmg.mp4" style="width: 100%; display: block; border-radius: var(--radius-lg);"></video>
+                    <img id="heroImage" src="assets/images/product-main.png" alt="Shyga Amrit" style="display: none; width: 100%; border-radius: var(--radius-lg);">
                 </div>
                 <!-- Small thumbnail strip -->
                 <div class="thumb-strip">
-                    <img src="assets/images/product-main.png" class="active" alt="Thumb 1">
+                    <img src="assets/images/product-main.png" class="active" alt="Video Thumb" data-type="video">
                     <img src="assets/images/lifestyle-hero.png" alt="Thumb 2">
                     <img src="assets/images/lifestyle-banner.jpg" alt="Thumb 3">
                     <img src="assets/images/step1-measure.jpg" alt="Thumb 4">
