@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>चेकआउट | शुगर अमृत</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+</head>
+<body class="checkout-page">
+
+    <!-- CHECKOUT HEADER -->
+    <header class="checkout-header">
+        <div class="container checkout-header-inner">
+            <a href="index.html" class="logo">शुगर:अमृत</a>
+            <div class="secure-badge"><i class="ri-lock-2-line"></i> सुरक्षित चेकआउट</div>
+        </div>
+    </header>
+
+    <main class="checkout-grid fade-in">
+        
+        <!-- LEFT COLUMN: FORM -->
+        <div class="checkout-form-section">
+            <form class="checkout-form" id="checkoutForm">
+                
+                <div class="shade-selector">
+                    <h3 class="italic-display" style="font-size: 2.5rem; margin-bottom: 0.5rem;">शुगर अमृत</h3>
+                    <p style="text-transform: none; font-family: var(--font-heading); font-size: 1.25rem; color: var(--clr-text); font-weight: 400; margin-bottom: 2rem;">रोजचे आयुर्वेदिक आरोग्य</p>
+                    
+                    <p>प्लॅन निवडा:</p>
+                    <div class="shade-pills" id="planSelector">
+                        <div class="shade-pill" data-plan="single">सिंगल पॅक</div>
+                        <div class="shade-pill active" data-plan="combo">कॉम्बो पॅक (३)</div>
+                    </div>
+                </div>
+
+                <div style="margin: 2rem 0; height: 1px; background: #EAEAEA;"></div>
+
+                <section class="form-group">
+                    <h3>संपर्क माहिती</h3>
+                    <div class="input-row">
+                        <input type="email" placeholder="ईमेल पत्ता" required>
+                    </div>
+                    <div class="input-row">
+                        <input type="tel" placeholder="फोन नंबर (अपडेट्ससाठी)" required>
+                    </div>
+                </section>
+
+                <section class="form-group">
+                    <h3>शिपिंग पत्ता</h3>
+                    <div class="input-row split">
+                        <input type="text" placeholder="पहिले नाव" required>
+                        <input type="text" placeholder="आडनाव" required>
+                    </div>
+                    <div class="input-row">
+                        <input type="text" placeholder="पत्ता" required>
+                    </div>
+                    <div class="input-row">
+                        <input type="text" placeholder="अपार्टमेंट, सूट, इ. (पर्यायी)">
+                    </div>
+                    <div class="input-row split">
+                        <input type="text" placeholder="शहर" required>
+                        <input type="text" placeholder="पिन कोड" required>
+                    </div>
+                </section>
+
+                <section class="form-group">
+                    <h3>पेमेंट पद्धत</h3>
+                    <div class="payment-methods">
+                        <label class="payment-option selected">
+                            <div class="payment-radio-flex">
+                                <input type="radio" name="payment" value="cod" checked>
+                                <div class="payment-info">
+                                    <span class="option-text">कॅश ऑन डिलिव्हरी</span>
+                                    <span class="payment-subtext">पॅकेज मिळाल्यावर पैसे द्या</span>
+                                </div>
+                            </div>
+                            <i class="ri-money-rupee-circle-line payment-icon"></i>
+                        </label>
+                        <label class="payment-option">
+                            <div class="payment-radio-flex">
+                                <input type="radio" name="payment" value="upi">
+                                <div class="payment-info">
+                                    <span class="option-text">यूपीआय / नेटबँकिंग</span>
+                                    <span class="payment-subtext">Google Pay, PhonePe, Paytm</span>
+                                </div>
+                            </div>
+                            <div class="payment-icons-group">
+                                <i class="ri-google-play-line"></i>
+                                <i class="ri-smartphone-line"></i>
+                            </div>
+                        </label>
+                        <label class="payment-option">
+                            <div class="payment-radio-flex">
+                                <input type="radio" name="payment" value="card">
+                                <div class="payment-info">
+                                    <span class="option-text">क्रेडिट / डेबिट कार्ड</span>
+                                    <span class="payment-subtext">Visa, MasterCard, RuPay</span>
+                                </div>
+                            </div>
+                            <div class="payment-icons-group">
+                                <i class="ri-visa-line"></i>
+                                <i class="ri-mastercard-line"></i>
+                            </div>
+                        </label>
+                    </div>
+                </section>
+
+                <button type="submit" class="btn btn-primary btn-block btn-pay">ऑर्डर पूर्ण करा</button>
+            </form>
+        </div>
+
+        <!-- RIGHT COLUMN: SUMMARY -->
+        <aside class="checkout-summary-section">
+            <div class="summary-card">
+                <h3 class="italic-display">ऑर्डर सारांश</h3>
+                
+                <div class="cart-item">
+                    <div class="item-img">
+                        <img src="assets/images/product-main.png" alt="Product">
+                        <span class="item-qty" id="qtyBadge">३</span>
+                    </div>
+                    <div class="item-details">
+                        <h4 class="italic-display">शुगर अमृत</h4>
+                        <p class="item-variant" id="planName">कॉम्बो पॅक</p>
+                    </div>
+                    <div class="item-price" id="planPrice">₹१८००</div>
+                </div>
+
+                <div class="summary-lines">
+                    <div class="line">
+                        <span>उप-एकूण</span>
+                        <span id="subtotalPrice">₹१८००</span>
+                    </div>
+                    <div class="line">
+                        <span>शिपिंग</span>
+                        <span>मोफत</span>
+                    </div>
+                </div>
+                
+                <div class="summary-total">
+                    <span>एकूण</span>
+                    <span class="total-price" id="totalPrice">₹१८००</span>
+                </div>
+            </div>
+        </aside>
+        
+    </main>
+
+    <footer class="footer">
+        <div class="container footer-bottom" style="border: none; padding-top: 0; margin-top: -2rem;">
+            <p>&copy; 2026 शुगर अमृत.</p>
+        </div>
+    </footer>
+
+    <!-- WHATSAPP FLOATING BUTTON -->
+    <a href="https://wa.me/919270283842" target="_blank" class="whatsapp-float">
+        <i class="ri-whatsapp-line"></i>
+    </a>
+
+    <!-- PAYMENT GATEWAY MODAL (SIMULATED) -->
+    <div id="payment-modal" class="payment-modal">
+        <div class="payment-modal-content">
+            <div class="payment-modal-header">
+                <h3>सुरक्षित पेमेंट</h3>
+                <button type="button" class="close-modal"><i class="ri-close-line"></i></button>
+            </div>
+            <div class="payment-modal-body">
+                <div class="secure-badge"><i class="ri-lock-2-line"></i> 100% Secure Checkout</div>
+                
+                <div class="payment-loader" id="payment-loader">
+                    <div class="spinner"></div>
+                    <p>पेमेंट गेटवे लोड होत आहे...</p>
+                </div>
+                
+                <div class="payment-form" id="payment-fake-form" style="display:none;">
+                    <p class="pay-amount">एकूण रक्कम: <span id="modal-amount">₹९९९</span></p>
+                    
+                    <!-- CARD UI -->
+                    <div id="card-ui-section" style="display:none;">
+                        <div class="fake-input">
+                            <i class="ri-bank-card-line"></i> 
+                            <input type="text" placeholder="कार्ड नंबर प्रविष्ट करा" style="background:transparent; border:none; outline:none; width:100%; font-size:1rem; color:var(--clr-dark);">
+                        </div>
+                    </div>
+
+                    <!-- UPI UI -->
+                    <div id="upi-ui-section" style="display:none; text-align:center;">
+                        <div style="background:#F5F7FA; padding:1.5rem; border-radius:var(--radius-lg); margin-bottom:1rem; border:1px solid var(--clr-gray-300);">
+                            <div style="display:flex; align-items:center; justify-content:center; gap:0.5rem; margin-bottom:1rem;">
+                                <div style="background:#5C469C; color:white; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:1.1rem;">S</div>
+                                <h4 style="margin:0; font-size:1.25rem; color:var(--clr-dark);">Sanket Metkar</h4>
+                            </div>
+                            <!-- Generating real UPI QR Code using QR Server API -->
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=sanketmetkar2023@okaxis&pn=Sanket%20Metkar" alt="UPI QR Code" style="background:white; padding:0.5rem; border-radius:0.5rem; border:1px solid #EAEAEA; max-width:200px;">
+                            <p style="margin-top:1rem; font-weight:600; color:var(--clr-dark); font-size:1.1rem;">UPI ID: sanketmetkar2023@okaxis</p>
+                            <p style="margin-top:0.5rem; font-size:0.9rem; color:var(--clr-gray-600);">कोणत्याही UPI ॲपसह स्कॅन करा (GPay, PhonePe, Paytm)</p>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-primary btn-block" id="confirm-fake-pay" style="margin-top:1.5rem;">पेमेंट पूर्ण केले</button>
+                </div>
+                
+                <div class="payment-success" id="payment-success-msg" style="display:none;">
+                    <i class="ri-checkbox-circle-fill" style="color:var(--clr-success); font-size:5rem; margin-bottom:1rem; display:inline-block;"></i>
+                    <h3>पेमेंट यशस्वी!</h3>
+                    <p style="margin-top:0.5rem; color:var(--clr-gray-600);">तुमची ऑर्डर प्राप्त झाली आहे.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS -->
+    <script src="js/app.js"></script>
+</body>
+</html>
