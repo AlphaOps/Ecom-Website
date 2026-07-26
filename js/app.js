@@ -213,7 +213,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     sessionStorage.setItem('draftId', this.draftId);
                 }
 
-                this.isSaving = false;
+                this.debounceTimer = null;
+                this.abortController = null;
                 this.init();
             }
 
@@ -248,58 +249,74 @@ document.addEventListener('DOMContentLoaded', () => {
                 return false;
             }
 
-            async fetchWithRetry(payload, retries = 3) {
+            async fetchWithRetry(payload, retries = 3, keepalive = false) {
+                // Abort any in-flight request to prevent race conditions
+                if (this.abortController && !keepalive) {
+                    this.abortController.abort();
+                }
+                
+                if (!keepalive) {
+                    this.abortController = new AbortController();
+                }
+
+                const options = {
+                    method: 'POST',
+                    body: JSON.stringify(payload),
+                    headers: { 'Content-Type': 'text/plain;charset=UTF-8' }
+                };
+
+                if (keepalive) {
+                    options.keepalive = true;
+                } else {
+                    options.signal = this.abortController.signal;
+                }
+
                 for (let i = 0; i < retries; i++) {
                     try {
-                        const response = await fetch(this.webhookUrl, {
-                            method: 'POST',
-                            body: JSON.stringify(payload),
-                            headers: { 'Content-Type': 'text/plain;charset=UTF-8' }
-                        });
-                        // Allow opaque responses or successful responses
+                        const response = await fetch(this.webhookUrl, options);
                         return true;
                     } catch (error) {
+                        if (error.name === 'AbortError') return false; // Intentionally aborted
                         if (i === retries - 1) console.error('Webhook failed:', error);
-                        await new Promise(res => setTimeout(res, 1000 * (i + 1))); // exponential backoff
+                        if (!keepalive) await new Promise(res => setTimeout(res, 1000 * (i + 1))); // backoff
                     }
                 }
                 return false;
             }
 
-            async autoSave(force = false) {
-                if (this.isSaving) return;
+            async autoSave(force = false, keepalive = false) {
                 const data = this.getFormData();
                 const currentDataString = this.hasDataChanged(data);
                 
                 if (currentDataString || force) {
-                    this.isSaving = true;
-                    const success = await this.fetchWithRetry(data);
+                    const success = await this.fetchWithRetry(data, keepalive ? 1 : 3, keepalive);
                     if (success) {
                         this.lastSavedData = currentDataString;
                         sessionStorage.setItem('lastSavedDraft', currentDataString);
                     }
-                    this.isSaving = false;
                 }
             }
 
-            init() {
-                // Listen to blur events on critical fields
-                const triggers = ['firstName', 'lastName', 'email', 'phone'];
-                triggers.forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) {
-                        el.addEventListener('blur', () => this.autoSave());
-                    }
-                });
+            debouncedAutoSave() {
+                if (this.debounceTimer) clearTimeout(this.debounceTimer);
+                this.debounceTimer = setTimeout(() => {
+                    this.autoSave();
+                }, 2000);
+            }
 
-                // Listen to changes on entire form
+            init() {
                 const form = document.getElementById('checkoutForm');
                 if (form) {
-                    form.addEventListener('change', () => this.autoSave());
+                    form.addEventListener('input', () => this.debouncedAutoSave());
+                    form.addEventListener('change', () => this.debouncedAutoSave());
                 }
 
-                // Auto-save every 15 seconds
-                setInterval(() => this.autoSave(), 15000);
+                // Handle tab close / navigation
+                window.addEventListener('visibilitychange', () => {
+                    if (document.visibilityState === 'hidden') {
+                        this.autoSave(false, true);
+                    }
+                });
             }
         }
 
