@@ -158,8 +158,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const planNameEl = document.getElementById('planName');
         const planPriceEl = document.getElementById('planPrice');
-        const subtotalPriceEl = document.getElementById('subtotalPrice');
+        const mrpPriceEl = document.getElementById('mrpPrice');
+        const discountPriceEl = document.getElementById('discountPrice');
         const totalPriceEl = document.getElementById('totalPrice');
+        const saveAmountEl = document.getElementById('saveAmount');
         const qtyEl = document.getElementById('qtyBadge');
         const pills = document.querySelectorAll('.shade-pill');
 
@@ -167,14 +169,18 @@ document.addEventListener('DOMContentLoaded', () => {
             if (selectedPlan === 'combo') {
                 if(planNameEl) planNameEl.textContent = 'कॉम्बो पॅक (३ बॉटल)';
                 if(planPriceEl) planPriceEl.textContent = '₹१८००';
-                if(subtotalPriceEl) subtotalPriceEl.textContent = '₹१८००';
+                if(mrpPriceEl) mrpPriceEl.textContent = '₹२९९७';
+                if(discountPriceEl) discountPriceEl.textContent = '- ₹११९७';
                 if(totalPriceEl) totalPriceEl.textContent = '₹१८००';
+                if(saveAmountEl) saveAmountEl.textContent = '₹११९७';
                 if(qtyEl) qtyEl.textContent = '३';
             } else {
                 if(planNameEl) planNameEl.textContent = 'सिंगल पॅक';
                 if(planPriceEl) planPriceEl.textContent = '₹७५०';
-                if(subtotalPriceEl) subtotalPriceEl.textContent = '₹७५०';
+                if(mrpPriceEl) mrpPriceEl.textContent = '₹९९९';
+                if(discountPriceEl) discountPriceEl.textContent = '- ₹२४९';
                 if(totalPriceEl) totalPriceEl.textContent = '₹७५०';
+                if(saveAmountEl) saveAmountEl.textContent = '₹२४९';
                 if(qtyEl) qtyEl.textContent = '१';
             }
             
