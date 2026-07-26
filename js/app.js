@@ -201,6 +201,103 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        // Abandoned Cart & Auto-Save Logic
+        class CheckoutAutoSaver {
+            constructor() {
+                this.webhookUrl = 'https://script.google.com/macros/s/AKfycbw2iDlEuCb17BuPOmYGEJWcfXYun2yS13uS1_j6tJM4ZyP_ZFTjVdB_oCzxcHWWXgyQYw/exec';
+                this.lastSavedData = sessionStorage.getItem('lastSavedDraft') || '';
+                this.isSaving = false;
+                this.init();
+            }
+
+            getFormData(status = "Pending", reminder = "No", draft = "true") {
+                const firstName = document.getElementById('firstName')?.value.trim() || '';
+                const lastName = document.getElementById('lastName')?.value.trim() || '';
+                const name = (firstName + ' ' + lastName).trim();
+                const phone = document.getElementById('phone')?.value.trim() || '';
+                const email = document.getElementById('email')?.value.trim() || '';
+                const apt = document.getElementById('apt')?.value.trim() || '';
+                const address = (document.getElementById('address')?.value.trim() || '') + (apt ? ', ' + apt : '');
+                const city = document.getElementById('city')?.value.trim() || '';
+                const pincode = document.getElementById('pincode')?.value.trim() || '';
+                const product = document.getElementById('planName') ? document.getElementById('planName').textContent : 'Unknown';
+                const amount = document.getElementById('totalPrice') ? document.getElementById('totalPrice').textContent.replace(/[^0-9]/g, '') : '0';
+                
+                const paymentMethodInput = document.querySelector('input[name="payment"]:checked');
+                const payment = paymentMethodInput ? paymentMethodInput.value : '';
+
+                return {
+                    name, phone, email, address, city, pincode, product, amount, payment, status, reminder, draft
+                };
+            }
+
+            hasDataChanged(data) {
+                // We only care if at least name, email or phone is present
+                if (!data.name && !data.email && !data.phone) return false;
+                const currentDataString = JSON.stringify(data);
+                if (currentDataString !== this.lastSavedData) {
+                    return currentDataString;
+                }
+                return false;
+            }
+
+            async fetchWithRetry(payload, retries = 3) {
+                for (let i = 0; i < retries; i++) {
+                    try {
+                        const response = await fetch(this.webhookUrl, {
+                            method: 'POST',
+                            body: JSON.stringify(payload),
+                            headers: { 'Content-Type': 'text/plain;charset=UTF-8' }
+                        });
+                        // Allow opaque responses or successful responses
+                        return true;
+                    } catch (error) {
+                        if (i === retries - 1) console.error('Webhook failed:', error);
+                        await new Promise(res => setTimeout(res, 1000 * (i + 1))); // exponential backoff
+                    }
+                }
+                return false;
+            }
+
+            async autoSave(force = false) {
+                if (this.isSaving) return;
+                const data = this.getFormData();
+                const currentDataString = this.hasDataChanged(data);
+                
+                if (currentDataString || force) {
+                    this.isSaving = true;
+                    const success = await this.fetchWithRetry(data);
+                    if (success) {
+                        this.lastSavedData = currentDataString;
+                        sessionStorage.setItem('lastSavedDraft', currentDataString);
+                    }
+                    this.isSaving = false;
+                }
+            }
+
+            init() {
+                // Listen to blur events on critical fields
+                const triggers = ['firstName', 'lastName', 'email', 'phone'];
+                triggers.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.addEventListener('blur', () => this.autoSave());
+                    }
+                });
+
+                // Listen to changes on entire form
+                const form = document.getElementById('checkoutForm');
+                if (form) {
+                    form.addEventListener('change', () => this.autoSave());
+                }
+
+                // Auto-save every 15 seconds
+                setInterval(() => this.autoSave(), 15000);
+            }
+        }
+
+        const autoSaver = new CheckoutAutoSaver();
+
         // Form Submit & Payment Modal Logic
         const checkoutForm = document.getElementById('checkoutForm');
         checkoutForm.addEventListener('submit', async (e) => {
@@ -213,31 +310,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const submitBtn = document.getElementById('submitBtn');
             const formMessage = document.getElementById('formMessage');
             
-            // Gather form data
-            const firstName = document.getElementById('firstName').value.trim();
-            const lastName = document.getElementById('lastName').value.trim();
-            const name = firstName + ' ' + lastName;
-            const phone = document.getElementById('phone').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const apt = document.getElementById('apt').value.trim();
-            const address = document.getElementById('address').value.trim() + (apt ? ', ' + apt : '');
-            const city = document.getElementById('city').value.trim();
-            const pincode = document.getElementById('pincode').value.trim();
-            const product = document.getElementById('planName') ? document.getElementById('planName').textContent : 'Unknown';
-            const amount = document.getElementById('totalPrice') ? document.getElementById('totalPrice').textContent.replace(/[^0-9]/g, '') : '0';
-            
-            const payload = {
-                name,
-                phone,
-                email,
-                address,
-                city,
-                pincode,
-                product,
-                amount,
-                payment: paymentMethod
-            };
-
             // UI Feedback during submission
             const originalBtnText = submitBtn.innerHTML;
             submitBtn.disabled = true;
@@ -248,28 +320,24 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             try {
-                const response = await fetch('https://script.google.com/macros/s/AKfycbw2iDlEuCb17BuPOmYGEJWcfXYun2yS13uS1_j6tJM4ZyP_ZFTjVdB_oCzxcHWWXgyQYw/exec', {
-                    method: 'POST',
-                    body: JSON.stringify(payload),
-                    headers: {
-                        'Content-Type': 'text/plain;charset=UTF-8'
-                    }
-                });
-
-                if (!response.ok) throw new Error('Network response was not ok');
-                
-                // Show success message
-                if(formMessage) {
-                    formMessage.style.color = '#388e3c';
-                    formMessage.textContent = 'Order placed successfully!';
-                }
-                
                 if (paymentMethod === 'cod') {
+                    // Send final completed payload
+                    const finalPayload = autoSaver.getFormData('Completed', 'Yes', 'false');
+                    await autoSaver.fetchWithRetry(finalPayload);
+                    
+                    if(formMessage) {
+                        formMessage.style.color = '#388e3c';
+                        formMessage.textContent = 'Order placed successfully!';
+                    }
                     checkoutForm.reset();
+                    sessionStorage.removeItem('lastSavedDraft');
                     setTimeout(() => {
                         window.location.href = 'index.html';
                     }, 2500);
                 } else {
+                    // It's UPI or Card - Just ensure a draft is saved first
+                    await autoSaver.autoSave(true);
+
                     // Show secure payment modal for UPI / Card
                     const modal = document.getElementById('payment-modal');
                     const loader = document.getElementById('payment-loader');
@@ -299,7 +367,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             loader.style.display = 'none';
                             fakeForm.style.display = 'block';
                             
-                            // Show specific UI
                             if (paymentMethod === 'upi') {
                                 if(upiUi) upiUi.style.display = 'block';
                             } else if (paymentMethod === 'card') {
@@ -330,19 +397,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         if (confirmPayBtn) {
-            confirmPayBtn.addEventListener('click', () => {
-                const fakeForm = document.getElementById('payment-fake-form');
-                const successMsg = document.getElementById('payment-success-msg');
-                
-                // Show success
-                if(fakeForm) fakeForm.style.display = 'none';
-                if(successMsg) successMsg.style.display = 'block';
-                
-                // Redirect after success
-                setTimeout(() => {
-                    alert('तुमचे पेमेंट यशस्वी झाले आहे! धन्यवाद.');
-                    window.location.href = 'index.html';
-                }, 2000);
+            confirmPayBtn.addEventListener('click', async () => {
+                const originalText = confirmPayBtn.textContent;
+                confirmPayBtn.disabled = true;
+                confirmPayBtn.textContent = 'Processing...';
+
+                try {
+                    // Send final completed payload after successful "payment"
+                    const finalPayload = autoSaver.getFormData('Completed', 'Yes', 'false');
+                    await autoSaver.fetchWithRetry(finalPayload);
+                    sessionStorage.removeItem('lastSavedDraft');
+
+                    const fakeForm = document.getElementById('payment-fake-form');
+                    const successMsg = document.getElementById('payment-success-msg');
+                    
+                    if(fakeForm) fakeForm.style.display = 'none';
+                    if(successMsg) successMsg.style.display = 'block';
+                    
+                    setTimeout(() => {
+                        alert('तुमचे पेमेंट यशस्वी झाले आहे! धन्यवाद.');
+                        window.location.href = 'index.html';
+                    }, 2000);
+                } catch(err) {
+                    console.error(err);
+                    alert('पेमेंट अयशस्वी. कृपया पुन्हा प्रयत्न करा.');
+                    confirmPayBtn.disabled = false;
+                    confirmPayBtn.textContent = originalText;
+                }
             });
         }
     }
