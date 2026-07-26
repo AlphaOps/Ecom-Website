@@ -203,53 +203,120 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Form Submit & Payment Modal Logic
         const checkoutForm = document.getElementById('checkoutForm');
-        checkoutForm.addEventListener('submit', (e) => {
+        checkoutForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const paymentMethodInput = document.querySelector('input[name="payment"]:checked');
             if (!paymentMethodInput) return;
             const paymentMethod = paymentMethodInput.value;
             
-            if (paymentMethod === 'cod') {
-                alert('तुमची ऑर्डर यशस्वीरित्या प्राप्त झाली आहे! लवकरच तुमच्याशी संपर्क साधला जाईल.');
-                window.location.href = 'index.html';
-            } else {
-                // Show secure payment modal for UPI / Card
-                const modal = document.getElementById('payment-modal');
-                const loader = document.getElementById('payment-loader');
-                const fakeForm = document.getElementById('payment-fake-form');
-                const successMsg = document.getElementById('payment-success-msg');
-                const modalAmount = document.getElementById('modal-amount');
+            const submitBtn = document.getElementById('submitBtn');
+            const formMessage = document.getElementById('formMessage');
+            
+            // Gather form data
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const name = firstName + ' ' + lastName;
+            const phone = document.getElementById('phone').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const apt = document.getElementById('apt').value.trim();
+            const address = document.getElementById('address').value.trim() + (apt ? ', ' + apt : '');
+            const city = document.getElementById('city').value.trim();
+            const pincode = document.getElementById('pincode').value.trim();
+            const product = document.getElementById('planName') ? document.getElementById('planName').textContent : 'Unknown';
+            const amount = document.getElementById('totalPrice') ? document.getElementById('totalPrice').textContent.replace(/[^0-9]/g, '') : '0';
+            
+            const payload = {
+                name,
+                phone,
+                email,
+                address,
+                city,
+                pincode,
+                product,
+                amount,
+                payment: paymentMethod
+            };
+
+            // UI Feedback during submission
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="ri-loader-4-line" style="display:inline-block; animation: spin 1s linear infinite; margin-right:8px;"></i> ऑर्डर प्रक्रियेत आहे...';
+            if(formMessage) {
+                formMessage.textContent = '';
+                formMessage.style.color = '';
+            }
+
+            try {
+                const response = await fetch('https://script.google.com/macros/s/AKfycbw2iDlEuCb17BuPOmYGEJWcfXYun2yS13uS1_j6tJM4ZyP_ZFTjVdB_oCzxcHWWXgyQYw/exec', {
+                    method: 'POST',
+                    body: JSON.stringify(payload),
+                    headers: {
+                        'Content-Type': 'text/plain;charset=UTF-8'
+                    }
+                });
+
+                if (!response.ok) throw new Error('Network response was not ok');
                 
-                const upiUi = document.getElementById('upi-ui-section');
-                const cardUi = document.getElementById('card-ui-section');
-                
-                if (totalPriceEl && modalAmount) {
-                    modalAmount.textContent = totalPriceEl.textContent;
+                // Show success message
+                if(formMessage) {
+                    formMessage.style.color = '#388e3c';
+                    formMessage.textContent = 'Order placed successfully!';
                 }
-
-                if (modal) {
-                    modal.classList.add('active');
-                    loader.style.display = 'block';
-                    fakeForm.style.display = 'none';
-                    successMsg.style.display = 'none';
-                    
-                    if(upiUi) upiUi.style.display = 'none';
-                    if(cardUi) cardUi.style.display = 'none';
-
-                    // Simulate loading gateway connection
+                
+                if (paymentMethod === 'cod') {
+                    checkoutForm.reset();
                     setTimeout(() => {
-                        loader.style.display = 'none';
-                        fakeForm.style.display = 'block';
+                        window.location.href = 'index.html';
+                    }, 2500);
+                } else {
+                    // Show secure payment modal for UPI / Card
+                    const modal = document.getElementById('payment-modal');
+                    const loader = document.getElementById('payment-loader');
+                    const fakeForm = document.getElementById('payment-fake-form');
+                    const successMsg = document.getElementById('payment-success-msg');
+                    const modalAmount = document.getElementById('modal-amount');
+                    
+                    const upiUi = document.getElementById('upi-ui-section');
+                    const cardUi = document.getElementById('card-ui-section');
+                    
+                    const totalPriceEl = document.getElementById('totalPrice');
+                    if (totalPriceEl && modalAmount) {
+                        modalAmount.textContent = totalPriceEl.textContent;
+                    }
+
+                    if (modal) {
+                        modal.classList.add('active');
+                        loader.style.display = 'block';
+                        fakeForm.style.display = 'none';
+                        successMsg.style.display = 'none';
                         
-                        // Show specific UI
-                        if (paymentMethod === 'upi') {
-                            if(upiUi) upiUi.style.display = 'block';
-                        } else if (paymentMethod === 'card') {
-                            if(cardUi) cardUi.style.display = 'block';
-                        }
-                    }, 1000);
+                        if(upiUi) upiUi.style.display = 'none';
+                        if(cardUi) cardUi.style.display = 'none';
+
+                        // Simulate loading gateway connection
+                        setTimeout(() => {
+                            loader.style.display = 'none';
+                            fakeForm.style.display = 'block';
+                            
+                            // Show specific UI
+                            if (paymentMethod === 'upi') {
+                                if(upiUi) upiUi.style.display = 'block';
+                            } else if (paymentMethod === 'card') {
+                                if(cardUi) cardUi.style.display = 'block';
+                            }
+                        }, 1000);
+                    }
                 }
+            } catch (error) {
+                console.error('Error submitting order:', error);
+                if(formMessage) {
+                    formMessage.style.color = '#d32f2f';
+                    formMessage.textContent = 'Unable to place your order. Please try again.';
+                }
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
             }
         });
 

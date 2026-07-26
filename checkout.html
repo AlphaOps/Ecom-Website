@@ -43,28 +43,28 @@
                 <section class="form-group">
                     <h3>संपर्क माहिती</h3>
                     <div class="input-row">
-                        <input type="email" placeholder="ईमेल पत्ता" required>
+                        <input type="email" id="email" placeholder="ईमेल पत्ता" required>
                     </div>
                     <div class="input-row">
-                        <input type="tel" placeholder="फोन नंबर (अपडेट्ससाठी)" required>
+                        <input type="tel" id="phone" placeholder="फोन नंबर (अपडेट्ससाठी)" required>
                     </div>
                 </section>
 
                 <section class="form-group">
                     <h3>शिपिंग पत्ता</h3>
                     <div class="input-row split">
-                        <input type="text" placeholder="पहिले नाव" required>
-                        <input type="text" placeholder="आडनाव" required>
+                        <input type="text" id="firstName" placeholder="पहिले नाव" required>
+                        <input type="text" id="lastName" placeholder="आडनाव" required>
                     </div>
                     <div class="input-row">
-                        <input type="text" placeholder="पत्ता" required>
+                        <input type="text" id="address" placeholder="पत्ता" required>
                     </div>
                     <div class="input-row">
-                        <input type="text" placeholder="अपार्टमेंट, सूट, इ. (पर्यायी)">
+                        <input type="text" id="apt" placeholder="अपार्टमेंट, सूट, इ. (पर्यायी)">
                     </div>
                     <div class="input-row split">
-                        <input type="text" placeholder="शहर" required>
-                        <input type="text" placeholder="पिन कोड" required>
+                        <input type="text" id="city" placeholder="शहर" required>
+                        <input type="text" id="pincode" placeholder="पिन कोड" required>
                     </div>
                 </section>
 
@@ -110,7 +110,8 @@
                     </div>
                 </section>
 
-                <button type="submit" class="btn btn-primary btn-block btn-pay">ऑर्डर पूर्ण करा</button>
+                <button type="submit" id="submitBtn" class="btn btn-primary btn-block btn-pay">ऑर्डर पूर्ण करा</button>
+                <div id="formMessage" style="margin-top: 1rem; text-align: center; font-weight: 500;"></div>
             </form>
         </div>
 
