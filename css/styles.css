@@ -172,6 +172,8 @@ img { max-width: 100%; height: auto; display: block; border-radius: inherit; }
 .pricing-card { background: var(--clr-white); border-radius: var(--radius-lg); padding: 3rem; box-shadow: var(--shadow-card); text-align: center; position: relative; border: 2px solid transparent; }
 .pricing-card.featured { border-color: var(--clr-primary); }
 .pricing-badge { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: var(--clr-primary); color: var(--clr-white); padding: 0.5rem 1.5rem; border-radius: 100px; font-weight: 700; font-size: 0.9rem; }
+.corner-ribbon { position: absolute; top: -5px; right: -5px; width: 130px; height: 130px; overflow: hidden; z-index: 10; }
+.corner-ribbon-text { position: absolute; display: block; width: 225px; padding: 10px 0; background-color: #ffd700; background-image: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c); box-shadow: 0 5px 10px rgba(0,0,0,.1); color: #000; font-weight: 800; font-size: 0.8rem; text-transform: uppercase; text-align: center; left: -25px; top: 25px; transform: rotate(45deg); letter-spacing: 1px; }
 .pricing-card img { height: 200px; margin: 0 auto 2rem; object-fit: contain; }
 .pricing-card h3 { font-size: 2.5rem; margin-bottom: 1rem; }
 .price { font-size: 2.5rem; font-weight: 700; color: var(--clr-text); font-family: var(--font-body); margin-bottom: 1.5rem; }

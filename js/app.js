@@ -177,10 +177,10 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 if(planNameEl) planNameEl.textContent = 'सिंगल पॅक';
                 if(planPriceEl) planPriceEl.textContent = '₹७५०';
-                if(mrpPriceEl) mrpPriceEl.textContent = '₹९९९';
-                if(discountPriceEl) discountPriceEl.textContent = '- ₹२४९';
+                if(mrpPriceEl) mrpPriceEl.textContent = '₹१४९९';
+                if(discountPriceEl) discountPriceEl.textContent = '- ₹७४९';
                 if(totalPriceEl) totalPriceEl.textContent = '₹७५०';
-                if(saveAmountEl) saveAmountEl.textContent = '₹२४९';
+                if(saveAmountEl) saveAmountEl.textContent = '₹७४९';
                 if(qtyEl) qtyEl.textContent = '१';
             }
             
