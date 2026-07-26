@@ -206,11 +206,18 @@ document.addEventListener('DOMContentLoaded', () => {
             constructor() {
                 this.webhookUrl = 'https://script.google.com/macros/s/AKfycbw2iDlEuCb17BuPOmYGEJWcfXYun2yS13uS1_j6tJM4ZyP_ZFTjVdB_oCzxcHWWXgyQYw/exec';
                 this.lastSavedData = sessionStorage.getItem('lastSavedDraft') || '';
+                
+                this.draftId = sessionStorage.getItem('draftId');
+                if (!this.draftId) {
+                    this.draftId = 'draft_' + Math.random().toString(36).substring(2, 11);
+                    sessionStorage.setItem('draftId', this.draftId);
+                }
+
                 this.isSaving = false;
                 this.init();
             }
 
-            getFormData(status = "Pending", reminder = "No", draft = "true") {
+            getFormData(status = "Pending", reminder = "No") {
                 const firstName = document.getElementById('firstName')?.value.trim() || '';
                 const lastName = document.getElementById('lastName')?.value.trim() || '';
                 const name = (firstName + ' ' + lastName).trim();
@@ -227,7 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const payment = paymentMethodInput ? paymentMethodInput.value : '';
 
                 return {
-                    name, phone, email, address, city, pincode, product, amount, payment, status, reminder, draft
+                    name, phone, email, address, city, pincode, product, amount, payment, status, reminder, draftId: this.draftId
                 };
             }
 
@@ -322,7 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 if (paymentMethod === 'cod') {
                     // Send final completed payload
-                    const finalPayload = autoSaver.getFormData('Completed', 'Yes', 'false');
+                    const finalPayload = autoSaver.getFormData('Completed', 'Yes');
                     await autoSaver.fetchWithRetry(finalPayload);
                     
                     if(formMessage) {
@@ -404,7 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 try {
                     // Send final completed payload after successful "payment"
-                    const finalPayload = autoSaver.getFormData('Completed', 'Yes', 'false');
+                    const finalPayload = autoSaver.getFormData('Completed', 'Yes');
                     await autoSaver.fetchWithRetry(finalPayload);
                     sessionStorage.removeItem('lastSavedDraft');
 
